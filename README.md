@@ -31,7 +31,8 @@ make api          # http://localhost:8000/docs
 make mobile       # Expo dev server
 ```
 
-Run every check: `make check`. See each app's README for details:
+Run every check: `make check`. The API deploys to Vercel on merge to `main`
+([setup](docs/deploy/vercel.md)). See each app's README for details:
 [apps/mobile](apps/mobile/README.md) · [apps/api](apps/api/README.md).
 
 ## Status

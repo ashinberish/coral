@@ -15,6 +15,7 @@ Approved mockup: [`mockups/coral-playful.html`](mockups/coral-playful.html).
 | Backend | FastAPI, Pydantic v2, pydantic-settings, SQLAlchemy 2.1 async + asyncpg, Alembic |
 | Database | PostgreSQL 18 |
 | Observability | OpenTelemetry (OTLP → Collector → Jaeger locally), structlog JSON logs |
+| Hosting | API on Vercel (Python function, Fluid compute) + Neon Postgres; deployed from GitHub Actions on merge to `main` ([guide](deploy/vercel.md)) |
 | CI | GitHub Actions per app; Postgres service container for API integration tests |
 
 The app is **offline-first**: everything works on-device; the API adds accounts, sync and

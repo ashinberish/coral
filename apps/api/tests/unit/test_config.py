@@ -37,3 +37,43 @@ def test_database_url_escapes_credentials() -> None:
 def test_password_is_not_leaked_in_repr() -> None:
     db = DatabaseSettings(password="supersecret")  # type: ignore[arg-type]
     assert "supersecret" not in repr(db.model_dump(exclude={"url"}))
+
+
+NEON_POOLED = (
+    "postgresql://app:s3cret@ep-calm-123456-pooler.eu-central-1.aws.neon.tech/neondb"
+    "?sslmode=require&channel_binding=require"
+)
+
+
+def test_platform_database_url_is_normalised_for_asyncpg(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("DATABASE_URL", NEON_POOLED)
+    db = Settings(_env_file=None).database
+
+    assert db.url == (
+        "postgresql+asyncpg://app:s3cret@ep-calm-123456-pooler.eu-central-1.aws.neon.tech/neondb"
+        "?prepared_statement_cache_size=0"
+    )
+    assert db.uses_pgbouncer
+    assert db.connect_args["ssl"] == "require"
+    assert db.connect_args["statement_cache_size"] == 0
+    name_func = db.connect_args["prepared_statement_name_func"]
+    assert name_func() != name_func()  # unique names per statement
+
+
+def test_explicit_dsn_beats_platform_url(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("DATABASE_URL", NEON_POOLED)
+    monkeypatch.setenv("CORAL_DATABASE__DSN", "postgres://x:y@db.internal:6000/coral")
+    db = Settings(_env_file=None).database
+
+    assert db.url == "postgresql+asyncpg://x:y@db.internal:6000/coral"
+    assert not db.uses_pgbouncer
+    assert db.connect_args == {}
+
+
+def test_pgbouncer_can_be_forced_off_and_ssl_disable_is_ignored() -> None:
+    db = DatabaseSettings(
+        dsn="postgresql://a:b@ep-x-pooler.neon.tech/db?sslmode=disable",  # type: ignore[arg-type]
+        pgbouncer=False,
+    )
+    assert db.url == "postgresql+asyncpg://a:b@ep-x-pooler.neon.tech/db"
+    assert db.connect_args == {}
