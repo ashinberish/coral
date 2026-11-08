@@ -70,15 +70,21 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
-      - uses: astral-sh/setup-uv@v7
+      # The Vercel CLI looks for the interpreter named in .python-version on PATH; if it is
+      # missing it silently builds with another version and native wheels (pydantic_core)
+      # no longer match the function runtime. Install the exact version first.
+      - uses: actions/setup-python@v7
         with:
-          python-version: "3.13"
+          python-version-file: apps/api/.python-version
+      - uses: astral-sh/setup-uv@v7
       - name: Install Vercel CLI
         run: npm install --global vercel@65
       - name: Pull production settings and env
         run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
       - name: Build
         run: vercel build --prod --token="$VERCEL_TOKEN"
+      - name: Verify bundle matches the Python runtime
+        run: python scripts/verify_vercel_bundle.py
       - name: Deploy
         id: deploy
         run: |
