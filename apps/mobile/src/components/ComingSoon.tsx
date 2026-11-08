@@ -1,4 +1,5 @@
 import { Link } from 'expo-router';
+import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Logo } from '@/components/brand/Logo';
@@ -6,7 +7,15 @@ import { AppText, Bubble, ChunkyButton, Screen } from '@/components/ui';
 import { spacing } from '@/theme';
 
 /** Placeholder for tabs that land in later milestones. */
-export function ComingSoon({ title, message }: { title: string; message: string }) {
+export function ComingSoon({
+  title,
+  message,
+  children,
+}: {
+  title: string;
+  message: string;
+  children?: ReactNode;
+}) {
   return (
     <Screen contentStyle={styles.content}>
       <AppText variant="title">{title}</AppText>
@@ -16,6 +25,7 @@ export function ComingSoon({ title, message }: { title: string; message: string 
           {message}
         </Bubble>
       </View>
+      {children}
       <Link href="/design" asChild>
         <ChunkyButton tone="blue" variant="outline">
           Open design system

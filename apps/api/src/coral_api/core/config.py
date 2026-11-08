@@ -124,6 +124,39 @@ class TelemetrySettings(BaseModel):
     metrics_export_interval_ms: int = Field(default=15_000, ge=1_000)
 
 
+_DEV_JWT_SECRET = "dev-only-insecure-secret-change-me-0000000000"  # noqa: S105
+
+
+class AuthSettings(BaseModel):
+    """Sign in with Apple / Google → our own short-lived access JWT + rotating refresh token."""
+
+    # HMAC key for access tokens. MUST be overridden outside local/test (min 32 chars).
+    jwt_secret: SecretStr = SecretStr(_DEV_JWT_SECRET)
+    jwt_issuer: str = "coral-api"
+    jwt_audience: str = "coral-app"
+    access_token_ttl_s: int = Field(default=15 * 60, ge=60, le=24 * 3600)
+    refresh_token_ttl_days: int = Field(default=60, ge=1, le=365)
+
+    # Accepted `aud` values of provider ID tokens.
+    # Apple: the iOS bundle identifier. Google: the OAuth *web* client ID (plus any others).
+    apple_audiences: Annotated[list[str], NoDecode] = Field(
+        default_factory=lambda: ["app.coral.hydration"]
+    )
+    google_audiences: Annotated[list[str], NoDecode] = Field(default_factory=list)
+
+    apple_issuer: str = "https://appleid.apple.com"
+    apple_jwks_url: str = "https://appleid.apple.com/auth/keys"
+    google_issuers: Annotated[list[str], NoDecode] = Field(
+        default_factory=lambda: ["https://accounts.google.com", "accounts.google.com"]
+    )
+    google_jwks_url: str = "https://www.googleapis.com/oauth2/v3/certs"
+
+    @field_validator("apple_audiences", "google_audiences", "google_issuers", mode="before")
+    @classmethod
+    def _split_lists(cls, value: object) -> object:
+        return _split_csv(value) if isinstance(value, str) else value
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="CORAL_",
@@ -153,6 +186,7 @@ class Settings(BaseSettings):
         exclude=True,
     )
     telemetry: TelemetrySettings = Field(default_factory=TelemetrySettings)
+    auth: AuthSettings = Field(default_factory=AuthSettings)
 
     @property
     def is_production(self) -> bool:
@@ -161,6 +195,17 @@ class Settings(BaseSettings):
     @property
     def docs_enabled(self) -> bool:
         return not self.is_production
+
+    @model_validator(mode="after")
+    def _require_real_secrets(self) -> Self:
+        if self.env in (Environment.STAGING, Environment.PRODUCTION):
+            secret = self.auth.jwt_secret.get_secret_value()
+            if secret == _DEV_JWT_SECRET or len(secret) < 32:
+                raise ValueError(
+                    "CORAL_AUTH__JWT_SECRET must be set to a random value of at least 32 "
+                    "characters in staging/production"
+                )
+        return self
 
     @model_validator(mode="after")
     def _apply_database_url(self) -> Self:

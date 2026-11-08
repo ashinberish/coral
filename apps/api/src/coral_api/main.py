@@ -13,6 +13,7 @@ from coral_api.core.logging import configure_logging, get_logger
 from coral_api.core.middleware import RequestContextMiddleware
 from coral_api.core.telemetry import setup_telemetry
 from coral_api.db.session import Database
+from coral_api.modules.auth.providers import JwksIdentityVerifier
 from coral_api.modules.health.router import router as health_router
 
 logger = get_logger(__name__)
@@ -48,6 +49,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         },
     )
     app.state.settings = settings
+    app.state.identity_verifier = JwksIdentityVerifier(settings.auth)
 
     register_exception_handlers(app)
     if settings.cors_origins:

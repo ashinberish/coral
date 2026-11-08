@@ -18,8 +18,9 @@ Approved mockup: [`mockups/coral-playful.html`](mockups/coral-playful.html).
 | Hosting | API on Vercel (Python function, Fluid compute) + Neon Postgres; deployed from GitHub Actions on merge to `main` ([guide](deploy/vercel.md)) |
 | CI | GitHub Actions per app; Postgres service container for API integration tests |
 
-The app is **offline-first**: everything works on-device; the API adds accounts, sync and
-backup (M2+). See [ADR 0001](adr/0001-monorepo.md) and [ADR 0002](adr/0002-backend-stack.md).
+Sign-in is **required at onboarding** (Apple / Google, API-issued tokens; see
+[auth.md](auth.md)). Drink logging stays **offline-tolerant**: logs are written on-device first
+and synced to the API (M2). See [ADR 0001](adr/0001-monorepo.md) and [ADR 0002](adr/0002-backend-stack.md).
 
 ## Domain model
 
@@ -48,6 +49,7 @@ Badge     { id, unlocked_at?, level? }
 |---|---|---|
 | **M0** ✅ | Monorepo, tooling, CI, backend foundation (settings, DB, migrations, telemetry, errors, health), local infra, docs | All checks green in CI |
 | **M1** ✅ | Design tokens, Nunito, ChunkyButton/Tile/Bubble/ProgressBar/Ring/StatPill/Medal/TabBar, icon set, 3D icon + splash, Today screen on demo data, `/design` style guide | Today matches the mockup |
+| Auth ✅ | Sign in with Apple / Google, JWT + rotating refresh tokens, `/v1/me` (incl. account deletion), typed API client, protected routes | Signed-out users only see sign-in |
 | M2 | Local DB + store; Today wired to real logs; custom amount sheet; API: users + drink-log endpoints, generated TS client | Logs persist across restarts |
 | M3 | Streak engine (unit-tested incl. DST/timezones), Streak screen, "Ring closed" celebration | Streak maths tested |
 | M4 | Pearls, quests, badges, freeze shop, Badges screen | Rewards correct |

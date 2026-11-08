@@ -9,7 +9,8 @@ earn pearls and badges. Game-like UI, a 3D Apple-style icon, and no water drops 
 apps/
   mobile/        Expo SDK 58 app (React Native, TypeScript, Expo Router)
   api/           FastAPI + PostgreSQL backend (SQLAlchemy 2.1, Alembic, OpenTelemetry)
-packages/        shared JS/TS packages (e.g. the generated API client — coming with M2)
+packages/
+  api-client/    typed API client generated from the API's OpenAPI schema
 infra/
   docker/        local stack: Postgres 18, OpenTelemetry Collector, Jaeger
   otel/          collector configuration
@@ -39,6 +40,7 @@ Run every check: `make check`. The API deploys to Vercel on merge to `main`
 
 - **M0 Foundation** — monorepo, tooling, CI, backend foundation, local infra ✅
 - **M1 Design system** — tokens, Nunito, chunky components, 3D icon, Today screen (demo data) ✅
+- **Auth**: required sign-in with Apple / Google; API-issued JWT + rotating refresh tokens ✅ ([docs/auth.md](docs/auth.md))
 - M2 Logging & Today (data) · M3 Streaks · M4 Quests/pearls/badges · M5 Reminders · M6 Onboarding & settings · M7 Polish
 
 Details in [docs/PLAN.md](docs/PLAN.md).

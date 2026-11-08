@@ -12,6 +12,7 @@ def test_defaults_are_local_and_docs_enabled(monkeypatch: pytest.MonkeyPatch) ->
 
 def test_nested_env_vars_and_csv_cors(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("CORAL_ENV", "production")
+    monkeypatch.setenv("CORAL_AUTH__JWT_SECRET", "s" * 40)
     monkeypatch.setenv("CORAL_LOG_FORMAT", "json")
     monkeypatch.setenv("CORAL_DATABASE__HOST", "db.internal")
     monkeypatch.setenv("CORAL_DATABASE__POOL_SIZE", "25")
@@ -77,3 +78,20 @@ def test_pgbouncer_can_be_forced_off_and_ssl_disable_is_ignored() -> None:
     )
     assert db.url == "postgresql+asyncpg://a:b@ep-x-pooler.neon.tech/db"
     assert db.connect_args == {}
+
+
+def test_production_requires_a_real_jwt_secret(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("CORAL_ENV", "production")
+    with pytest.raises(ValueError, match="CORAL_AUTH__JWT_SECRET"):
+        Settings(_env_file=None)
+    monkeypatch.setenv("CORAL_AUTH__JWT_SECRET", "short")
+    with pytest.raises(ValueError, match="CORAL_AUTH__JWT_SECRET"):
+        Settings(_env_file=None)
+
+
+def test_auth_audiences_from_csv(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("CORAL_AUTH__GOOGLE_AUDIENCES", "web.apps.googleusercontent.com, ios.x")
+    assert Settings(_env_file=None).auth.google_audiences == [
+        "web.apps.googleusercontent.com",
+        "ios.x",
+    ]

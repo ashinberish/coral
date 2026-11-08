@@ -35,10 +35,24 @@ class Problem(BaseModel):
 class AppError(Exception):
     status: ClassVar[HTTPStatus] = HTTPStatus.INTERNAL_SERVER_ERROR
     code: ClassVar[str] = "internal_error"
+    headers: ClassVar[dict[str, str]] = {}
 
     def __init__(self, detail: str | None = None) -> None:
         super().__init__(detail or self.status.phrase)
         self.detail = detail
+
+
+class UnauthorizedError(AppError):
+    """Missing, invalid or expired credentials."""
+
+    status = HTTPStatus.UNAUTHORIZED
+    code = "unauthorized"
+    headers: ClassVar[dict[str, str]] = {"WWW-Authenticate": "Bearer"}
+
+
+class ServiceUnavailableError(AppError):
+    status = HTTPStatus.SERVICE_UNAVAILABLE
+    code = "service_unavailable"
 
 
 class NotFoundError(AppError):
@@ -66,10 +80,12 @@ def _problem(request: Request, problem: Problem) -> JSONResponse:
 
 async def _app_error(request: Request, exc: Exception) -> JSONResponse:
     assert isinstance(exc, AppError)  # noqa: S101 - narrowed by registration
-    return _problem(
+    response = _problem(
         request,
         Problem(title=exc.status.phrase, status=exc.status, detail=exc.detail, code=exc.code),
     )
+    response.headers.update(exc.headers)
+    return response
 
 
 async def _http_error(request: Request, exc: Exception) -> JSONResponse:
