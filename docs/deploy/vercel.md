@@ -93,6 +93,16 @@ installed into the function's `_vendor/`).
 Vercel's Python builder walks the tracked file list, so ignoring a tracked file makes the
 remote build fail with `ENOENT: no such file or directory, readlink '/vercel/path0/<file>'`.
 
+## Troubleshooting
+
+**`ModuleNotFoundError: No module named 'pydantic_core._pydantic_core'`** at runtime means the
+bundle's compiled packages target a different Python than the function runtime. The Vercel CLI
+uses the interpreter from `apps/api/.python-version` *only if it is on PATH*; otherwise it warns
+`Python version "3.13" ... is not installed and will be ignored` and builds with another
+version. The deploy workflow installs the exact version with `actions/setup-python` and runs
+`scripts/verify_vercel_bundle.py` to block mismatched bundles. When building locally with
+`--prebuilt`, make sure `python3.13` is installed, and build on Linux x86_64 (not macOS).
+
 ## Limits worth knowing
 
 - Max duration 300 s by default (800 s on Pro); 4.5 MB request/response bodies.
