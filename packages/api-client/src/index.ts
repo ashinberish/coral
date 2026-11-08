@@ -42,6 +42,21 @@ export class ApiError extends Error {
   }
 }
 
+const NULL_BODY_STATUSES = new Set([101, 204, 205, 304]);
+
+/** Rebuild a (possibly foreign) Response as an instance of globalThis.Response. */
+type ResponseLike = Pick<Response, 'status' | 'statusText' | 'headers' | 'text'>;
+
+async function toGlobalResponse(response: ResponseLike): Promise<Response> {
+  if (response instanceof Response) return response;
+  const body = NULL_BODY_STATUSES.has(response.status) ? null : await response.text(); // API bodies are JSON text
+  return new Response(body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers,
+  });
+}
+
 export function createCoralClient(options: CoralClientOptions) {
   const doFetch = options.fetch ?? globalThis.fetch.bind(globalThis);
   const client = createClient<paths>({ baseUrl: options.baseUrl, fetch: doFetch });
@@ -63,19 +78,22 @@ export function createCoralClient(options: CoralClientOptions) {
       pending.set(id, request.clone());
       return request;
     },
+    // Return nothing unless the response is replaced: openapi-fetch treats any returned value
+    // as a replacement and requires `instanceof Response`, which fails on React Native/Expo,
+    // whose fetch can return Response objects of a different class than globalThis.Response.
     async onResponse({ response, id }) {
       const original = pending.get(id);
       pending.delete(id);
-      if (response.status !== 401 || !original) return response;
+      if (response.status !== 401 || !original) return undefined;
 
       const path = new URL(original.url).pathname;
-      if (NO_RETRY_PREFIXES.some((prefix) => path.startsWith(prefix))) return response;
+      if (NO_RETRY_PREFIXES.some((prefix) => path.startsWith(prefix))) return undefined;
 
       const token = await refreshOnce();
-      if (!token) return response;
+      if (!token) return undefined;
       const retry = new Request(original, { headers: new Headers(original.headers) });
       retry.headers.set('Authorization', `Bearer ${token}`);
-      return doFetch(retry);
+      return toGlobalResponse(await doFetch(retry));
     },
     onError({ id }) {
       pending.delete(id);
