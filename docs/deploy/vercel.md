@@ -43,6 +43,8 @@ including `DATABASE_URL` (pooled) and `DATABASE_URL_UNPOOLED` (direct).
 | Name | Value |
 |---|---|
 | `CORAL_ENV` | `production` |
+| `CORAL_AUTH__JWT_SECRET` | **required**: `openssl rand -base64 48` (the API refuses to start without it) |
+| `CORAL_AUTH__GOOGLE_AUDIENCES` | Google OAuth *web* client ID (see [auth.md](../auth.md)) |
 | `CORAL_LOG_FORMAT` | `json` |
 | `CORAL_DATABASE__POOL_SIZE` | `3` |
 | `CORAL_DATABASE__MAX_OVERFLOW` | `2` |

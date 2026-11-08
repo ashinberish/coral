@@ -10,7 +10,8 @@
     "ios": {
       "bundleIdentifier": "app.coral.hydration",
       "supportsTablet": false,
-      "icon": "./assets/images/icon.png"
+      "icon": "./assets/images/icon.png",
+      "usesAppleSignIn": true
     },
     "android": {
       "package": "app.coral.hydration",
@@ -36,7 +37,9 @@
           "imageWidth": 120
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-secure-store",
+      "expo-apple-authentication"
     ],
     "experiments": {
       "typedRoutes": true,

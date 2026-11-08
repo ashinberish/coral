@@ -1,0 +1,42 @@
+# Keeps the typed client in packages/api-client in sync with the API's OpenAPI schema.
+name: contract
+
+on:
+  pull_request:
+    paths:
+      - "apps/api/**"
+      - "packages/api-client/**"
+      - ".github/workflows/contract.yml"
+
+concurrency:
+  group: contract-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  api-client:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-glob: apps/api/uv.lock
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Regenerate schema and types
+        run: |
+          (cd apps/api && uv sync --locked && uv run python scripts/export_openapi.py)
+          pnpm --filter @coral/api-client generate
+      - name: Fail if the committed client is stale
+        run: |
+          git diff --exit-code -- packages/api-client || {
+            echo "::error::API schema changed. Run 'make api-client' and commit the result."; exit 1; }
+      - run: pnpm --filter @coral/api-client typecheck
+      - run: pnpm --filter @coral/api-client test
