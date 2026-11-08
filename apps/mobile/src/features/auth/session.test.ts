@@ -1,6 +1,8 @@
 import type { UserRead } from '@coral/api-client';
 
-import { createSessionStore } from './session';
+import { ApiError } from '@coral/api-client';
+
+import { createSessionStore, signInErrorMessage } from './session';
 import type { AppleCredential, IdentityProviders, TokenStorage } from './types';
 
 const USER: UserRead = {
@@ -198,6 +200,7 @@ describe('session store', () => {
   });
 
   it('shows a friendly error when the API rejects the sign-in', async () => {
+    jest.spyOn(console, 'warn').mockImplementationOnce(() => {});
     const store = createSessionStore({
       apiUrl: 'https://api.test',
       storage: memoryStorage().storage,
@@ -212,6 +215,31 @@ describe('session store', () => {
     await store.getState().signInWithGoogle();
     expect(store.getState().error).toBe('We could not sign you in. Please try again.');
     expect(store.getState().busy).toBe(false);
+  });
+
+  it('completes sign-in even if the keychain write fails', async () => {
+    const mem = memoryStorage();
+    mem.storage.setRefreshToken = async () => {
+      throw new Error('keychain unavailable');
+    };
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const store = createSessionStore({
+      apiUrl: 'https://api.test',
+      storage: mem.storage,
+      providers: providers(),
+      fetch: fakeApi({
+        'POST /v1/auth/apple': () => ({
+          status: 200,
+          body: { ...tokens(1), user: USER, is_new_user: false },
+        }),
+      }).fetch,
+    });
+
+    await store.getState().signInWithApple();
+
+    expect(store.getState()).toMatchObject({ status: 'signedIn', error: null });
+    expect(warn).toHaveBeenCalledWith('[auth] could not persist the session', expect.any(Error));
+    warn.mockRestore();
   });
 
   it('signs out locally even if the network call fails', async () => {
@@ -230,5 +258,18 @@ describe('session store', () => {
     expect(store.getState().status).toBe('signedOut');
     expect(mem.peek()).toEqual({ refresh: null, user: null });
     expect(p.google.signOut).toHaveBeenCalled();
+  });
+});
+
+describe('signInErrorMessage', () => {
+  it('only blames the connection for real network failures', () => {
+    expect(signInErrorMessage(new TypeError('Network request failed'))).toMatch(/^No connection/);
+    expect(signInErrorMessage(new Error('keychain broke'))).toBe(
+      'Something went wrong. Please try again. (keychain broke)', // __DEV__ adds detail
+    );
+    expect(signInErrorMessage(new ApiError(401, undefined))).toBe(
+      'We could not sign you in. Please try again.',
+    );
+    expect(signInErrorMessage(new ApiError(503, undefined))).toMatch(/temporarily unavailable/);
   });
 });

@@ -147,6 +147,9 @@ importers:
       vitest:
         specifier: ^5.1.0
         version: 5.1.0(@types/node@26.6.6)(jsdom@26.1.0)(vite@8.3.6(@types/node@26.6.6)(terser@5.51.2))
+      whatwg-fetch:
+        specifier: 3.6.20
+        version: 3.6.20
 
 packages:
 
