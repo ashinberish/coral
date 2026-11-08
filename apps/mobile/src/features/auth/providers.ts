@@ -1,12 +1,7 @@
-import {
-  GoogleSignin,
-  isErrorWithCode,
-  isSuccessResponse,
-  statusCodes,
-} from '@react-native-google-signin/google-signin';
+import type * as GoogleSignInModule from '@react-native-google-signin/google-signin';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import * as Crypto from 'expo-crypto';
-import { Platform } from 'react-native';
+import { Platform, TurboModuleRegistry } from 'react-native';
 
 import { config } from '@/lib/config';
 
@@ -16,9 +11,28 @@ function randomNonce(): string {
   return Array.from(Crypto.getRandomBytes(32), (b) => b.toString(16).padStart(2, '0')).join('');
 }
 
+type GoogleSdk = typeof GoogleSignInModule;
+let googleSdk: GoogleSdk | null | undefined;
+
+/**
+ * Google Sign-In ships native code that Expo Go doesn't include. Importing it eagerly crashes
+ * the app at launch there, so load it lazily and only when its native module is registered.
+ */
+function loadGoogleSdk(): GoogleSdk | null {
+  if (googleSdk === undefined) {
+    googleSdk = TurboModuleRegistry.get('RNGoogleSignin')
+      ? // eslint-disable-next-line @typescript-eslint/no-require-imports
+        (require('@react-native-google-signin/google-signin') as GoogleSdk)
+      : null;
+  }
+  return googleSdk;
+}
+
 let googleConfigured = false;
-function ensureGoogleConfigured(): boolean {
-  if (!config.googleWebClientId) return false;
+function ensureGoogleConfigured(): GoogleSdk | null {
+  const sdk = loadGoogleSdk();
+  if (!sdk || !config.googleWebClientId) return null;
+  const { GoogleSignin } = sdk;
   if (!googleConfigured) {
     // The *web* client ID is the ID token's audience, which the API verifies.
     GoogleSignin.configure({
@@ -27,7 +41,7 @@ function ensureGoogleConfigured(): boolean {
     });
     googleConfigured = true;
   }
-  return true;
+  return sdk;
 }
 
 export const nativeProviders: IdentityProviders = {
@@ -62,9 +76,13 @@ export const nativeProviders: IdentityProviders = {
     },
   },
   google: {
-    isConfigured: () => Boolean(config.googleWebClientId) && Platform.OS !== 'web',
+    // Hidden unless a web client ID is set AND the native module exists (not in Expo Go).
+    isConfigured: () =>
+      Boolean(config.googleWebClientId) && Platform.OS !== 'web' && loadGoogleSdk() !== null,
     async signIn() {
-      if (!ensureGoogleConfigured()) throw new Error('Google sign-in is not configured');
+      const sdk = ensureGoogleConfigured();
+      if (!sdk) throw new Error('Google sign-in is not available in this build');
+      const { GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes } = sdk;
       try {
         if (Platform.OS === 'android') await GoogleSignin.hasPlayServices();
         const response = await GoogleSignin.signIn();
@@ -77,7 +95,8 @@ export const nativeProviders: IdentityProviders = {
       }
     },
     async signOut() {
-      if (googleConfigured) await GoogleSignin.signOut().catch(() => null);
+      const sdk = googleConfigured ? loadGoogleSdk() : null;
+      if (sdk) await sdk.GoogleSignin.signOut().catch(() => null);
     },
   },
 };
