@@ -48,7 +48,7 @@
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
-    "doctor": "expo-doctor",
+    "doctor": "npx --yes expo-doctor",
     "icons": "node scripts/generate-icons.mjs"
   },
   "private": true,

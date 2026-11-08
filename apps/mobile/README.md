@@ -43,7 +43,7 @@ pnpm --filter @coral/mobile start  # Expo dev server (press i / a / w)
 pnpm --filter @coral/mobile lint
 pnpm --filter @coral/mobile typecheck
 pnpm --filter @coral/mobile test
-pnpm --filter @coral/mobile doctor
+pnpm --filter @coral/mobile run doctor
 ```
 
 ## Design system

@@ -29,7 +29,7 @@ jobs:
       - name: Test
         run: pnpm --filter @coral/mobile test --ci
       - name: Expo doctor
-        run: pnpm --filter @coral/mobile doctor
+        run: pnpm --filter @coral/mobile run doctor
       - name: Web export (smoke build)
         working-directory: apps/mobile
         run: npx expo export --platform web --output-dir dist
