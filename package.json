@@ -1,0 +1,16 @@
+{
+  "name": "coral",
+  "private": true,
+  "description": "Coral — a playful hydration app with streaks. Monorepo root.",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "mobile": "pnpm --filter @coral/mobile start",
+    "mobile:lint": "pnpm --filter @coral/mobile lint",
+    "mobile:typecheck": "pnpm --filter @coral/mobile typecheck",
+    "mobile:test": "pnpm --filter @coral/mobile test",
+    "check": "pnpm -r --if-present lint && pnpm -r --if-present typecheck && pnpm -r --if-present test"
+  }
+}

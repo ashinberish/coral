@@ -1,0 +1,100 @@
+# Deploys the API to Vercel production on every merge to main that touches apps/api.
+#
+#   checks (same as api.yml) ──► migrate (Alembic, direct DB URL) ──► deploy (Vercel CLI) ──► smoke test
+#
+# Setup (one-time) is documented in docs/deploy/vercel.md. Required in the GitHub
+# "production" environment:
+#   secrets: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, DATABASE_URL_UNPOOLED
+#   variables (optional): API_BASE_URL  e.g. https://coral-api.vercel.app (enables the smoke test)
+name: api-deploy
+
+on:
+  push:
+    branches: [main]
+    paths: ["apps/api/**", ".github/workflows/api-deploy.yml", ".github/workflows/api.yml"]
+  workflow_dispatch:
+
+# Never run two production deploys at once, and never cancel one half-way.
+concurrency:
+  group: api-deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    uses: ./.github/workflows/api.yml
+
+  migrate:
+    needs: checks
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-glob: apps/api/uv.lock
+      - run: uv sync --locked --no-dev
+      - name: Alembic upgrade head
+        # Use the *direct* (unpooled) connection: migrations need a session-level connection.
+        env:
+          CORAL_ENV: production
+          DATABASE_URL: ${{ secrets.DATABASE_URL_UNPOOLED }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::DATABASE_URL_UNPOOLED secret is not set (see docs/deploy/vercel.md)"; exit 1
+          fi
+          uv run alembic upgrade head
+          uv run alembic current
+
+  deploy:
+    needs: migrate
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ vars.API_BASE_URL }}
+    defaults:
+      run:
+        working-directory: apps/api
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.13"
+      - name: Install Vercel CLI
+        run: npm install --global vercel@65
+      - name: Pull production settings and env
+        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+      - name: Build
+        run: vercel build --prod --token="$VERCEL_TOKEN"
+      - name: Deploy
+        id: deploy
+        run: |
+          url=$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN")
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "Deployed: $url" >> "$GITHUB_STEP_SUMMARY"
+
+  smoke:
+    needs: deploy
+    if: vars.API_BASE_URL != ''
+    runs-on: ubuntu-latest
+    steps:
+      - name: Health and readiness
+        env:
+          BASE: ${{ vars.API_BASE_URL }}
+        run: |
+          curl --fail --silent --show-error --retry 6 --retry-delay 5 --retry-all-errors "$BASE/healthz"
+          curl --fail --silent --show-error --retry 6 --retry-delay 5 --retry-all-errors "$BASE/readyz"
+          curl --fail --silent --show-error "$BASE/v1/meta"

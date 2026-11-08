@@ -1,0 +1,7 @@
+<path d="M27 22 C38 25 41 36 35 44" fill="none" stroke="{FILL}" stroke-width="11" stroke-linecap="round"/>
+<path d="M35 44 C31 50 29 56 35 58 C40 59.5 42 54 38.5 52" fill="none" stroke="{FILL}" stroke-width="6" stroke-linecap="round"/>
+<circle cx="29" cy="17" r="9.5" fill="{FILL}"/>
+<path d="M33 13.5 L44 15.5 Q47 16 47 19 Q47 22 44 22 L33 23Z" fill="{FILL}"/>
+<path d="M24 9.5 L26 4.5 L29.5 8 L32 4 L33.5 9.5Z" fill="{FILL}"/>
+<path d="M35 27 L21 29 Q20 36 34 42Z" fill="{FILL}"/>
+<circle cx="31" cy="16" r="2.3" fill="{EYE}"/>
