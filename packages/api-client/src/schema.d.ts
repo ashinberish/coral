@@ -106,6 +106,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/days": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Daily totals for a range of days (days without drinks omitted) */
+        get: operations["list_days_v1_days_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/drinks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Drink logs for a range of days */
+        get: operations["list_drinks_v1_drinks_get"];
+        put?: never;
+        /** Log a drink (idempotent when `id` is supplied) */
+        post: operations["log_drink_v1_drinks_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/drinks/{log_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a drink log (idempotent) */
+        delete: operations["delete_drink_v1_drinks__log_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/me": {
         parameters: {
             query?: never;
@@ -163,6 +215,75 @@ export interface components {
              */
             nonce: string;
         };
+        /** DaySummary */
+        DaySummary: {
+            /**
+             * Day Key
+             * Format: date
+             */
+            day_key: string;
+            /** Drink Count */
+            drink_count: number;
+            /** Total Ml */
+            total_ml: number;
+        };
+        /** DrinkLogCreate */
+        DrinkLogCreate: {
+            /**
+             * Amount Ml
+             * @example 250
+             */
+            amount_ml: number;
+            /**
+             * Day Key
+             * Format: date
+             * @description User-local calendar day the drink counts towards.
+             */
+            day_key: string;
+            /** @default water */
+            drink_type: components["schemas"]["DrinkType"];
+            /**
+             * Id
+             * @description Client-generated ID. Makes the request idempotent, so offline queues can retry safely: re-sending the same ID returns the existing log.
+             */
+            id?: string | null;
+            /**
+             * Logged At
+             * Format: date-time
+             */
+            logged_at: string;
+        };
+        /** DrinkLogRead */
+        DrinkLogRead: {
+            /** Amount Ml */
+            amount_ml: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Day Key
+             * Format: date
+             */
+            day_key: string;
+            drink_type: components["schemas"]["DrinkType"];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Logged At
+             * Format: date-time
+             */
+            logged_at: string;
+        };
+        /**
+         * DrinkType
+         * @enum {string}
+         */
+        DrinkType: "water" | "tea" | "coffee" | "other";
         /** GoogleSignIn */
         GoogleSignIn: {
             /**
@@ -602,6 +723,217 @@ export interface operations {
                 };
             };
             /** @description Invalid credentials */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    list_days_v1_days_get: {
+        parameters: {
+            query: {
+                /** @description First user-local day (inclusive). */
+                from_day: string;
+                /** @description Last user-local day (inclusive). */
+                to_day: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DaySummary"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    list_drinks_v1_drinks_get: {
+        parameters: {
+            query: {
+                /** @description First user-local day (inclusive). */
+                from_day: string;
+                /** @description Last user-local day (inclusive). */
+                to_day: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DrinkLogRead"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    log_drink_v1_drinks_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DrinkLogCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DrinkLogRead"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    delete_drink_v1_drinks__log_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                log_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not signed in */
             401: {
                 headers: {
                     [name: string]: unknown;

@@ -5,11 +5,13 @@ from fastapi import APIRouter
 from coral_api.api.deps import SettingsDep
 from coral_api.modules.auth.router import router as auth_router
 from coral_api.modules.health.schemas import Meta
+from coral_api.modules.hydration.router import router as drinks_router
 from coral_api.modules.users.router import router as users_router
 
 router = APIRouter()
 router.include_router(auth_router)
 router.include_router(users_router)
+router.include_router(drinks_router)
 
 
 @router.get("/meta", tags=["meta"], summary="Service metadata")
