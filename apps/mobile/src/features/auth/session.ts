@@ -42,14 +42,25 @@ export type SessionDeps = {
   fetch?: typeof fetch;
 };
 
-const isNetworkError = (error: unknown) => !(error instanceof ApiError);
+/** fetch rejects with a TypeError ("Network request failed" on React Native) when offline. */
+export function isNetworkError(error: unknown): boolean {
+  return (
+    error instanceof TypeError &&
+    /network request failed|failed to fetch|load failed|network/i.test(error.message)
+  );
+}
 
-function message(error: unknown): string {
+const isDev = typeof __DEV__ !== 'undefined' && __DEV__;
+
+export function signInErrorMessage(error: unknown): string {
   if (error instanceof ApiError) {
     if (error.status === 503) return 'Sign-in is temporarily unavailable. Please try again.';
     return 'We could not sign you in. Please try again.';
   }
-  return 'No connection. Check your internet and try again.';
+  if (isNetworkError(error)) return 'No connection. Check your internet and try again.';
+  // Anything else is a bug or a device problem: never disguise it as a connectivity issue.
+  const detail = isDev && error instanceof Error ? ` (${error.message})` : '';
+  return `Something went wrong. Please try again.${detail}`;
 }
 
 export function createSessionStore({ apiUrl, storage, providers, fetch }: SessionDeps) {
@@ -71,8 +82,14 @@ export function createSessionStore({ apiUrl, storage, providers, fetch }: Sessio
       refresh_token: string;
       user: UserRead;
     }) => {
-      await storage.setRefreshToken(result.refresh_token);
-      await storage.setCachedUser(result.user);
+      try {
+        await storage.setRefreshToken(result.refresh_token);
+        await storage.setCachedUser(result.user);
+      } catch (error) {
+        // The server already accepted the sign-in; a keychain hiccup must not undo it.
+        // The session then lasts until the app is closed.
+        console.warn('[auth] could not persist the session', error);
+      }
       set({ status: 'signedIn', user: result.user, accessToken: result.access_token, error: null });
     };
 
@@ -81,7 +98,8 @@ export function createSessionStore({ apiUrl, storage, providers, fetch }: Sessio
       try {
         await exchange();
       } catch (error) {
-        set({ error: message(error) });
+        console.warn('[auth] sign-in failed', error);
+        set({ error: signInErrorMessage(error) });
       } finally {
         set({ busy: false });
       }
@@ -120,7 +138,8 @@ export function createSessionStore({ apiUrl, storage, providers, fetch }: Sessio
           await storage.setCachedUser(user);
           set({ status: 'signedIn', user });
         } catch (error) {
-          if (isNetworkError(error) && cached) return; // offline: keep the cached session
+          // Offline (or the server is unreachable): keep the cached session.
+          if (!(error instanceof ApiError) && cached) return;
           await reset();
         }
       },
