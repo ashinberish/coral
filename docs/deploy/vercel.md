@@ -89,6 +89,10 @@ The entrypoint is `[tool.vercel] entrypoint = "src.coral_api.asgi:app"` in `pypr
 (paths resolve from the project root, so the `src/` prefix is required; the package itself is
 installed into the function's `_vendor/`).
 
+`apps/api/.vercelignore` must only list files that git does **not** track (`.venv`, caches).
+Vercel's Python builder walks the tracked file list, so ignoring a tracked file makes the
+remote build fail with `ENOENT: no such file or directory, readlink '/vercel/path0/<file>'`.
+
 ## Limits worth knowing
 
 - Max duration 300 s by default (800 s on Pro); 4.5 MB request/response bodies.
