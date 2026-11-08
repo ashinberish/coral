@@ -42,8 +42,9 @@ jobs:
       - run: uv sync --locked --no-dev
       - name: Alembic upgrade head
         # Use the *direct* (unpooled) connection: migrations need a session-level connection.
+        # Only the database URL is needed here. Don't set CORAL_ENV=production: that turns on
+        # runtime-only guards (e.g. the required JWT secret), which live in Vercel, not GitHub.
         env:
-          CORAL_ENV: production
           DATABASE_URL: ${{ secrets.DATABASE_URL_UNPOOLED }}
         run: |
           if [ -z "$DATABASE_URL" ]; then
