@@ -48,6 +48,129 @@
         "title": "AppleSignIn",
         "type": "object"
       },
+      "DaySummary": {
+        "properties": {
+          "day_key": {
+            "format": "date",
+            "title": "Day Key",
+            "type": "string"
+          },
+          "drink_count": {
+            "title": "Drink Count",
+            "type": "integer"
+          },
+          "total_ml": {
+            "title": "Total Ml",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "day_key",
+          "total_ml",
+          "drink_count"
+        ],
+        "title": "DaySummary",
+        "type": "object"
+      },
+      "DrinkLogCreate": {
+        "properties": {
+          "amount_ml": {
+            "examples": [
+              250
+            ],
+            "maximum": 5000.0,
+            "minimum": 1.0,
+            "title": "Amount Ml",
+            "type": "integer"
+          },
+          "day_key": {
+            "description": "User-local calendar day the drink counts towards.",
+            "format": "date",
+            "title": "Day Key",
+            "type": "string"
+          },
+          "drink_type": {
+            "$ref": "#/components/schemas/DrinkType",
+            "default": "water"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Client-generated ID. Makes the request idempotent, so offline queues can retry safely: re-sending the same ID returns the existing log.",
+            "title": "Id"
+          },
+          "logged_at": {
+            "format": "date-time",
+            "title": "Logged At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "amount_ml",
+          "logged_at",
+          "day_key"
+        ],
+        "title": "DrinkLogCreate",
+        "type": "object"
+      },
+      "DrinkLogRead": {
+        "properties": {
+          "amount_ml": {
+            "title": "Amount Ml",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "day_key": {
+            "format": "date",
+            "title": "Day Key",
+            "type": "string"
+          },
+          "drink_type": {
+            "$ref": "#/components/schemas/DrinkType"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "logged_at": {
+            "format": "date-time",
+            "title": "Logged At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "amount_ml",
+          "drink_type",
+          "logged_at",
+          "day_key",
+          "created_at"
+        ],
+        "title": "DrinkLogRead",
+        "type": "object"
+      },
+      "DrinkType": {
+        "enum": [
+          "water",
+          "tea",
+          "coffee",
+          "other"
+        ],
+        "title": "DrinkType",
+        "type": "string"
+      },
       "GoogleSignIn": {
         "properties": {
           "id_token": {
@@ -812,6 +935,313 @@
         "summary": "Rotate the refresh token and get a new access token",
         "tags": [
           "auth"
+        ]
+      }
+    },
+    "/v1/days": {
+      "get": {
+        "operationId": "list_days_v1_days_get",
+        "parameters": [
+          {
+            "description": "First user-local day (inclusive).",
+            "in": "query",
+            "name": "from_day",
+            "required": true,
+            "schema": {
+              "description": "First user-local day (inclusive).",
+              "format": "date",
+              "title": "From Day",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Last user-local day (inclusive).",
+            "in": "query",
+            "name": "to_day",
+            "required": true,
+            "schema": {
+              "description": "Last user-local day (inclusive).",
+              "format": "date",
+              "title": "To Day",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DaySummary"
+                  },
+                  "title": "Response List Days V1 Days Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not signed in"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Validation error"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Daily totals for a range of days (days without drinks omitted)",
+        "tags": [
+          "drinks"
+        ]
+      }
+    },
+    "/v1/drinks": {
+      "get": {
+        "operationId": "list_drinks_v1_drinks_get",
+        "parameters": [
+          {
+            "description": "First user-local day (inclusive).",
+            "in": "query",
+            "name": "from_day",
+            "required": true,
+            "schema": {
+              "description": "First user-local day (inclusive).",
+              "format": "date",
+              "title": "From Day",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Last user-local day (inclusive).",
+            "in": "query",
+            "name": "to_day",
+            "required": true,
+            "schema": {
+              "description": "Last user-local day (inclusive).",
+              "format": "date",
+              "title": "To Day",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DrinkLogRead"
+                  },
+                  "title": "Response List Drinks V1 Drinks Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not signed in"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Validation error"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Drink logs for a range of days",
+        "tags": [
+          "drinks"
+        ]
+      },
+      "post": {
+        "operationId": "log_drink_v1_drinks_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DrinkLogCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DrinkLogRead"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not signed in"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Validation error"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Log a drink (idempotent when `id` is supplied)",
+        "tags": [
+          "drinks"
+        ]
+      }
+    },
+    "/v1/drinks/{log_id}": {
+      "delete": {
+        "operationId": "delete_drink_v1_drinks__log_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "log_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Log Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not signed in"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Validation error"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Internal error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Delete a drink log (idempotent)",
+        "tags": [
+          "drinks"
         ]
       }
     },

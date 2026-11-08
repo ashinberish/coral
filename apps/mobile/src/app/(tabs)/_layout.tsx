@@ -2,12 +2,16 @@ import { TabList, Tabs, TabSlot, TabTrigger } from 'expo-router/ui';
 import { StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useDrinkSync } from '@/features/drinks/useDrinkSync';
+import { useToday } from '@/lib/useToday';
+
 import { BellIcon, FlameIcon, HomeIcon, MedalIcon } from '@/components/icons';
 import { TabBarButton } from '@/components/ui';
 import { borderWidth, colors, spacing } from '@/theme';
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
+  useDrinkSync(useToday());
   return (
     <Tabs>
       <TabSlot />

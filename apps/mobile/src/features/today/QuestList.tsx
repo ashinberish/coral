@@ -4,7 +4,7 @@ import { ChestIcon } from '@/components/icons';
 import { AppText, ProgressBar, Tile } from '@/components/ui';
 import { colors, palette, spacing } from '@/theme';
 
-import type { Quest } from './demo';
+import type { Quest } from './quests';
 
 export function QuestList({ quests }: { quests: Quest[] }) {
   return (
