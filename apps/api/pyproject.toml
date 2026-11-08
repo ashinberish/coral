@@ -35,6 +35,11 @@ dev = [
     "ruff>=0.17.4",
 ]
 
+# ---------------------------------------------------------------- vercel
+# https://vercel.com/docs/frameworks/backend/fastapi
+[tool.vercel]
+entrypoint = "src.coral_api.asgi:app"
+
 # ---------------------------------------------------------------- ruff
 [tool.ruff]
 line-length = 100

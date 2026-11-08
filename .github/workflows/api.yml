@@ -3,13 +3,16 @@ name: api
 on:
   pull_request:
     paths: ["apps/api/**", ".github/workflows/api.yml"]
-  push:
-    branches: [main]
-    paths: ["apps/api/**", ".github/workflows/api.yml"]
+  # On main, these checks run as the first stage of api-deploy.yml.
+  workflow_call:
 
 concurrency:
-  group: api-${{ github.ref }}
-  cancel-in-progress: true
+  group: api-${{ github.workflow }}-${{ github.ref }}
+  # Only cancel superseded PR runs; never a run that gates a production deploy.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
 
 defaults:
   run:

@@ -24,6 +24,7 @@ class Database:
     def __init__(self, settings: DatabaseSettings) -> None:
         self.engine: AsyncEngine = create_async_engine(
             settings.url,
+            connect_args=settings.connect_args,
             echo=settings.echo,
             pool_size=settings.pool_size,
             max_overflow=settings.max_overflow,

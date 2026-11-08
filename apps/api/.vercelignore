@@ -1,0 +1,10 @@
+# Only the app and its lockfile are needed at runtime.
+.venv
+.env
+tests
+.pytest_cache
+.mypy_cache
+.ruff_cache
+Dockerfile
+.dockerignore
+**/__pycache__

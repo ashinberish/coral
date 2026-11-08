@@ -42,6 +42,13 @@ uv run coral-api                                          # http://localhost:800
 
 Traces: http://localhost:16686 (set `CORAL_TELEMETRY__ENABLED=true`).
 
+## Deploy
+
+Production runs on **Vercel** (Python function, Neon Postgres). Merges to `main` deploy
+automatically via `.github/workflows/api-deploy.yml` (checks → migrations → deploy → smoke
+test). Setup and policies: [docs/deploy/vercel.md](../../docs/deploy/vercel.md).
+The Dockerfile remains for local use and other container hosts.
+
 ## Checks
 
 ```bash
