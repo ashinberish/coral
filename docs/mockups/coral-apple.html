@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coral — Mockup</title>
+<style>
+  :root{
+    --blue:#FF5E4D; --cyan:#32C5F4; --orange:#FF5E4D; --green:#34C759;
+    --label:#000; --label2:rgba(60,60,67,.6); --label3:rgba(60,60,67,.3);
+    --sep:rgba(60,60,67,.18); --bg:#F2F2F7; --card:#fff; --fill:rgba(120,120,128,.12);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Inter","Helvetica Neue",Arial,sans-serif;
+       background:#e7e9ee;color:var(--label);-webkit-font-smoothing:antialiased;padding:48px 32px 80px}
+  header.page{max-width:1500px;margin:0 auto 40px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+  header.page h1{font-size:44px;letter-spacing:-.02em;font-weight:700}
+  header.page p{color:#6b6b72;font-size:17px;margin-top:6px;max-width:640px;line-height:1.4}
+  .appicon{width:96px;height:96px;border-radius:22px;background:#FF5E4D;--eye:#FF5E4D;
+           box-shadow:0 8px 24px rgba(0,0,0,.12);display:grid;place-items:center}
+  .grid{max-width:1500px;margin:0 auto;display:flex;flex-wrap:wrap;gap:44px 36px;justify-content:center}
+  figure{display:flex;flex-direction:column;align-items:center;gap:14px}
+  figcaption{font-size:14px;color:#6b6b72;font-weight:500}
+  figcaption b{color:#1c1c1e;font-weight:600}
+
+  /* phone */
+  .phone{width:340px;height:720px;border-radius:52px;background:#111;padding:10px;box-shadow:0 30px 60px rgba(0,0,0,.18),0 0 0 1px rgba(0,0,0,.25)}
+  .screen{position:relative;width:100%;height:100%;border-radius:43px;overflow:hidden;background:var(--bg);display:flex;flex-direction:column}
+  .island{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:104px;height:30px;border-radius:20px;background:#000;z-index:20}
+  .status{height:50px;display:flex;justify-content:space-between;align-items:center;padding:6px 30px 0 34px;font-size:15px;font-weight:600;flex-shrink:0}
+  .status .r{display:flex;gap:5px;align-items:center}
+  .content{flex:1;overflow:hidden;padding:0 16px}
+  .largetitle{font-size:32px;font-weight:700;letter-spacing:-.02em;margin:4px 4px 2px}
+  .subtitle{font-size:14px;color:var(--label2);margin:0 4px 14px;font-weight:500;text-transform:uppercase;letter-spacing:.02em}
+  .navrow{display:flex;justify-content:space-between;align-items:center}
+  .circbtn{width:34px;height:34px;border-radius:50%;background:var(--fill);display:grid;place-items:center}
+
+  /* tab bar */
+  .tabbar{position:absolute;left:0;right:0;bottom:0;height:82px;background:rgba(249,249,249,.82);backdrop-filter:blur(20px);
+          border-top:.5px solid var(--sep);display:flex;justify-content:space-around;padding-top:7px}
+  .tab{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:500;color:#999;width:80px}
+  .tab.on{color:var(--blue)}
+  .homebar{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);width:120px;height:5px;border-radius:3px;background:#000;z-index:30}
+
+  /* cards */
+  .card{background:var(--card);border-radius:14px}
+  .streakchip{display:inline-flex;align-items:center;gap:5px;background:rgba(255,94,77,.12);color:#D9402F;font-weight:600;font-size:14px;padding:6px 11px 6px 9px;border-radius:20px}
+  .ringwrap{position:relative;display:grid;place-items:center;margin:4px 0 10px}
+  .ringcenter{position:absolute;text-align:center}
+  .big{font-size:44px;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+  .big small{font-size:20px;font-weight:600;color:var(--label2);margin-left:2px}
+  .of{font-size:14px;color:var(--label2);font-weight:500;margin-top:2px}
+  .quick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+  .qa{background:var(--card);border-radius:14px;padding:11px 0 9px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:13px;font-weight:600}
+  .qa span{font-size:11px;color:var(--label2);font-weight:500}
+  .section-h{font-size:13px;color:var(--label2);text-transform:uppercase;letter-spacing:.02em;margin:0 16px 7px;font-weight:500}
+  .list{background:var(--card);border-radius:12px;overflow:hidden;margin-bottom:22px}
+  .row{display:flex;align-items:center;gap:12px;padding:0 16px;min-height:46px;position:relative;font-size:16px}
+  .row + .row::before{content:"";position:absolute;top:0;left:56px;right:0;height:.5px;background:var(--sep)}
+  .row.noicon + .row.noicon::before{left:16px}
+  .row .ic{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;flex-shrink:0}
+  .row .grow{flex:1}
+  .row .val{color:var(--label2);font-size:16px;display:flex;align-items:center;gap:6px}
+  .row .meta{font-size:13px;color:var(--label2)}
+  .toggle{width:51px;height:31px;border-radius:16px;background:var(--green);position:relative;flex-shrink:0}
+  .toggle::after{content:"";position:absolute;right:2px;top:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+  .toggle.off{background:#E9E9EA}.toggle.off::after{right:auto;left:2px}
+
+  /* streak */
+  .hero{background:var(--card);border-radius:16px;color:var(--label);padding:18px 18px 16px;margin-bottom:14px;position:relative;overflow:hidden}
+  .hero .n{font-size:52px;font-weight:700;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+  .hero .l{font-size:15px;font-weight:500;color:var(--label2)}
+  .hero .stats{display:grid;grid-template-columns:repeat(3,1fr);margin-top:14px;padding-top:12px;border-top:.5px solid var(--sep);font-size:12px;font-weight:500;color:var(--label2)}
+  .hero .stats div + div{border-left:.5px solid var(--sep);padding-left:12px}
+  .hero .stats div span{color:var(--label)}
+  .hero .stats div span{display:block;font-size:20px;font-weight:700}
+  .cal{background:var(--card);border-radius:16px;padding:14px 12px 12px;margin-bottom:14px}
+  .cal .hd{display:flex;justify-content:space-between;font-weight:600;font-size:16px;margin:0 4px 10px}
+  .cal .dow,.cal .days{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;gap:6px 0}
+  .cal .dow{font-size:11px;color:var(--label3);font-weight:600;margin-bottom:6px}
+  .d{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;margin:0 auto;font-size:14px;font-weight:500;font-variant-numeric:tabular-nums}
+  .d.met{background:var(--orange);color:#fff;font-weight:600}
+  .d.frz{border:2px solid #5AC8FA;color:#1b8fc4;font-weight:600}
+  .d.miss{color:var(--label3)}
+  .d.today{box-shadow:inset 0 0 0 2px var(--orange);color:#D9402F;font-weight:700}
+  .d.fut{color:var(--label3)}
+  .legend{display:flex;gap:14px;font-size:11px;color:var(--label2);margin:10px 4px 0;font-weight:500}
+  .legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+  .badges{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .badge{background:var(--card);border-radius:14px;padding:10px 0 8px;text-align:center;font-size:11px;font-weight:600;color:var(--label2)}
+  .badge .b{width:40px;height:40px;border-radius:50%;margin:0 auto 5px;display:grid;place-items:center;font-size:15px;font-weight:800;color:#fff}
+  .badge.lock .b{background:var(--fill)!important;color:var(--label3)}
+
+  /* sheet */
+  .dim{position:absolute;inset:0;background:rgba(0,0,0,.35);z-index:5}
+  .sheet{position:absolute;left:0;right:0;bottom:0;height:72%;background:var(--bg);border-radius:14px 14px 0 0;z-index:6;padding:8px 16px 0}
+  .grabber{width:36px;height:5px;border-radius:3px;background:rgba(60,60,67,.3);margin:0 auto 10px}
+  .sheethd{display:flex;justify-content:space-between;align-items:center;font-size:17px;margin-bottom:16px}
+  .sheethd b{font-weight:600}
+  .seg{display:grid;grid-template-columns:repeat(4,1fr);background:var(--fill);border-radius:9px;padding:2px;margin-bottom:16px;font-size:13px;font-weight:500;text-align:center}
+  .seg div{padding:6px 0;border-radius:7px}
+  .seg .on{background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.12);font-weight:600}
+  .wheel{background:var(--card);border-radius:14px;height:180px;position:relative;overflow:hidden;margin-bottom:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-variant-numeric:tabular-nums}
+  .wheel .sel{position:absolute;left:10px;right:10px;top:50%;height:36px;transform:translateY(-50%);background:var(--fill);border-radius:9px}
+  .wheel div.v{position:relative;font-size:21px;height:34px;line-height:34px}
+  .btn{background:var(--blue);color:#fff;text-align:center;font-weight:600;font-size:17px;border-radius:14px;padding:15px 0}
+
+  /* lock screen */
+  .lock{background:#2B3A55;color:#fff}
+  .lock .time{text-align:center;font-size:84px;font-weight:600;letter-spacing:-.02em;line-height:1;margin-top:6px}
+  .lock .date{text-align:center;font-size:18px;font-weight:600;opacity:.9;margin-top:22px}
+  .notif{margin:0 10px 8px;border-radius:20px;background:rgba(245,245,250,.72);backdrop-filter:blur(30px);color:#000;padding:12px 14px}
+  .notif .top{display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(0,0,0,.5);margin-bottom:4px}
+  .notif .t{font-weight:600;font-size:15px}
+  .notif .m{font-size:15px;line-height:1.3}
+  .mini{width:20px;height:20px;border-radius:5px;background:#FF5E4D;--eye:#FF5E4D;display:grid;place-items:center}
+  .actions{margin:0 10px;border-radius:14px;background:rgba(245,245,250,.72);backdrop-filter:blur(30px);color:#000;overflow:hidden}
+  .actions div{padding:13px 16px;font-size:16px;border-top:.5px solid rgba(0,0,0,.12)}
+  .actions div:first-child{border-top:0}
+
+  /* onboarding */
+  .ob{background:#fff;padding:0 26px}
+  .ob h2{font-size:30px;font-weight:700;letter-spacing:-.02em;text-align:center;margin-top:20px;line-height:1.15}
+  .ob p.lead{text-align:center;color:var(--label2);font-size:15px;margin:8px 0 14px;line-height:1.35}
+  .goalnum{text-align:center;font-size:52px;font-weight:700;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+  .goalnum small{font-size:24px;color:var(--label2);font-weight:600}
+  .stepper{display:flex;justify-content:center;gap:10px;margin:6px 0 20px}
+  .stepper div{width:56px;height:36px;border-radius:9px;background:var(--fill);display:grid;place-items:center;font-size:22px;font-weight:500;color:var(--blue)}
+  .feat{display:flex;gap:14px;align-items:flex-start;margin-bottom:13px}
+  .feat .fi{width:36px;flex-shrink:0;display:grid;place-items:center}
+  .feat b{display:block;font-size:15px;font-weight:600}
+  .feat span{font-size:14px;color:var(--label2);line-height:1.3}
+  .dots{display:flex;gap:7px;justify-content:center;margin:18px 0 14px}
+  .dots i{width:7px;height:7px;border-radius:50%;background:var(--label3)}.dots i.on{background:#000}
+
+  /* dark */
+  .dark{--blue:#FF6F61;--orange:#FF6F61;--label:#fff;--label2:rgba(235,235,245,.6);--label3:rgba(235,235,245,.3);--sep:rgba(84,84,88,.6);--bg:#000;--card:#1C1C1E;--fill:rgba(120,120,128,.24);color:#fff}
+  .dark .tabbar{background:rgba(22,22,22,.82)}
+  .dark .homebar{background:#fff}
+  .dark .streakchip{color:#FF8A7E;background:rgba(255,111,97,.2)}
+  .notes{max-width:1100px;margin:56px auto 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .note{background:#fff;border-radius:16px;padding:18px 20px;font-size:14px;line-height:1.45;color:#3a3a3c}
+  .note h3{font-size:15px;margin-bottom:6px;color:#000}
+
+</style>
+</head>
+<body>
+
+<!-- SVG symbol defs (SF-Symbol-like; deliberately no drop shapes) -->
+<svg width="0" height="0" style="position:absolute">
+  
+  <symbol id="sea" viewBox="0 0 64 64"><path d="M27 22 C38 25 41 36 35 44" fill="none" stroke="currentColor" stroke-width="11" stroke-linecap="round"/><path d="M35 44 C31 50 29 56 35 58 C40 59.5 42 54 38.5 52" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><circle cx="29" cy="17" r="9.5" fill="currentColor"/><path d="M33 13.5 L44 15.5 Q47 16 47 19 Q47 22 44 22 L33 23Z" fill="currentColor"/><path d="M24 9.5 L26 4.5 L29.5 8 L32 4 L33.5 9.5Z" fill="currentColor"/><path d="M32 28 L21 29 Q20 36 31 41Z" fill="currentColor"/><circle cx="31" cy="16" r="2.2" fill="var(--eye,#fff)"/></symbol>
+  <symbol id="flame" viewBox="0 0 24 24"><path fill="currentColor" d="M12.6 2.2c.3 2.6-1 4.3-2.4 5.9-1.5 1.7-3.1 3.4-3.1 6.3 0 3.3 2.4 5.6 5.4 5.6s5.4-2.3 5.4-5.7c0-2.2-1-3.9-2-5.1-.2 1.2-.8 2.2-1.8 2.7.4-2.9-.2-6.9-1.5-9.7zM12.3 19c-1.5 0-2.6-1.1-2.6-2.6 0-1.6 1.2-2.5 2-3.6.3 1 1 1.7 1.8 2.1.6.3 1.2.9 1.2 1.8 0 1.3-1 2.3-2.4 2.3z"/></symbol>
+  <symbol id="ringtab" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="3.2" stroke-dasharray="40 60" stroke-linecap="round" transform="rotate(-90 12 12)"/><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-opacity=".3" stroke-width="3.2"/></symbol>
+  <symbol id="chart" viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9" rx="1.2" fill="currentColor"/><rect x="10" y="7" width="4" height="14" rx="1.2" fill="currentColor"/><rect x="17" y="3" width="4" height="18" rx="1.2" fill="currentColor"/></symbol>
+  <symbol id="gear" viewBox="0 0 24 24"><path fill="currentColor" d="M13.7 2l.4 2.4c.6.2 1.2.5 1.7.9l2.3-.9 1.7 2.9-1.9 1.6c.1.7.1 1.3 0 2l1.9 1.6-1.7 2.9-2.3-.9c-.5.4-1.1.7-1.7.9l-.4 2.5h-3.4l-.4-2.5c-.6-.2-1.2-.5-1.7-.9l-2.3.9-1.7-2.9 1.9-1.6c-.1-.7-.1-1.3 0-2L4.2 7.3l1.7-2.9 2.3.9c.5-.4 1.1-.7 1.7-.9l.4-2.4h3.4zM12 8.6a3.4 3.4 0 100 6.8 3.4 3.4 0 000-6.8z" transform="translate(0 1.5)"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+  <symbol id="glass" viewBox="0 0 24 24"><path d="M5.5 4h13l-1.6 15.2a1.6 1.6 0 01-1.6 1.4H8.7a1.6 1.6 0 01-1.6-1.4L5.5 4z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M6.6 11h10.8l-.8 7.6a1 1 0 01-1 .9H8.4a1 1 0 01-1-.9L6.6 11z" fill="currentColor" opacity=".9"/></symbol>
+  <symbol id="bottle" viewBox="0 0 24 24"><path d="M10 2.5h4v2.2l1.4 2.1c.4.6.6 1.3.6 2V19.5a2 2 0 01-2 2h-4a2 2 0 01-2-2V8.8c0-.7.2-1.4.6-2L10 4.7V2.5z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><rect x="9.6" y="11" width="4.8" height="8.6" rx=".8" fill="currentColor"/></symbol>
+  <symbol id="cup" viewBox="0 0 24 24"><path d="M4 7h12v7a5 5 0 01-5 5H9a5 5 0 01-5-5V7z" fill="currentColor"/><path d="M16 9h1.5a2.5 2.5 0 010 5H16" fill="none" stroke="currentColor" stroke-width="1.9"/></symbol>
+  <symbol id="mug" viewBox="0 0 24 24"><rect x="4" y="5" width="12" height="15" rx="2.5" fill="currentColor"/><path d="M16 8.5h1.8a2.2 2.2 0 012.2 2.2v2.6a2.2 2.2 0 01-2.2 2.2H16" fill="none" stroke="currentColor" stroke-width="1.9"/></symbol>
+  <symbol id="bell" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.5a1.4 1.4 0 011.4 1.4v.6a6 6 0 014.6 5.8v4.2l1.7 2.2c.4.5 0 1.3-.7 1.3H5c-.7 0-1.1-.8-.7-1.3L6 14.5v-4.2a6 6 0 014.6-5.8v-.6A1.4 1.4 0 0112 2.5zM9.6 19h4.8a2.4 2.4 0 01-4.8 0z"/></symbol>
+  <symbol id="snow" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="1.9" stroke-linecap="round" fill="none"><path d="M12 2.5v19M3.8 7.2l16.4 9.6M3.8 16.8l16.4-9.6"/><path d="M9.5 4L12 6.4 14.5 4M9.5 20l2.5-2.4 2.5 2.4"/></g></symbol>
+  <symbol id="target" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/></g><circle cx="12" cy="12" r="1.6" fill="currentColor"/></symbol>
+  <symbol id="heart" viewBox="0 0 24 24"><path fill="currentColor" d="M12 20.5s-7.8-4.6-7.8-10.3A4.4 4.4 0 0112 7.6a4.4 4.4 0 017.8 2.6c0 5.7-7.8 10.3-7.8 10.3z"/></symbol>
+  <symbol id="moon" viewBox="0 0 24 24"><path fill="currentColor" d="M20 14.6A8.5 8.5 0 019.4 4a8.5 8.5 0 1010.6 10.6z"/></symbol>
+  <symbol id="clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="ruler" viewBox="0 0 24 24"><rect x="3" y="7.5" width="18" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 7.5v4M11 7.5v3M15 7.5v4M19 7.5v3" stroke="currentColor" stroke-width="1.6"/></symbol>
+  <symbol id="chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="bolt" viewBox="0 0 24 24"><path fill="currentColor" d="M13.5 2L5 13.5h6L10 22l9-12h-6.2l.7-8z"/></symbol>
+  <symbol id="signal" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="currentColor"/><rect x="5" y="5.5" width="3" height="6.5" rx="1" fill="currentColor"/><rect x="10" y="3" width="3" height="9" rx="1" fill="currentColor"/><rect x="15" y="0" width="3" height="12" rx="1" fill="currentColor"/></symbol>
+  <symbol id="batt" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.5" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="18" height="9" rx="2" fill="currentColor"/><rect x="24.5" y="4.5" width="1.6" height="4" rx=".8" fill="currentColor" opacity=".5"/></symbol>
+</svg>
+
+<header class="page">
+  <div style="display:flex;gap:22px;align-items:center">
+    <div class="appicon"><svg width="78" height="78" style="color:#fff"><use href="#sea"/></svg>
+    </div>
+    <div>
+      <h1>Coral</h1>
+      <p>A calm hydration reminder in the style of Apple's own apps. Close your ring and keep your streak. One coral accent, system colors, no gradients, no mascot and no water drops.</p>
+    </div>
+  </div>
+</header>
+
+<div class="grid">
+
+<!-- 1. ONBOARDING -->
+<figure>
+<div class="phone"><div class="screen ob">
+  <div class="island"></div>
+  <div class="status" style="padding-left:8px;padding-right:4px"><span>9:41</span><span class="r"><svg width="18" height="12"><use href="#signal"/></svg><svg width="27" height="13"><use href="#batt"/></svg></span></div>
+  <div class="dots" style="margin-top:6px"><i></i><i class="on"></i><i></i></div>
+  <div style="width:64px;height:64px;border-radius:15px;background:#FF5E4D;margin:4px auto 0;display:grid;place-items:center;--eye:#FF5E4D"><svg width="52" height="52" style="color:#fff"><use href="#sea"/></svg></div>
+  <h2 style="margin-top:10px">Your daily goal</h2>
+  <p class="lead">Based on 72 kg and a moderately active day.</p>
+  <div class="goalnum">2,500<small> ml</small></div>
+  <div class="stepper"><div>−</div><div>+</div></div>
+  <div class="feat"><div class="fi" style="color:var(--blue)"><svg width="28" height="28"><use href="#target"/></svg></div><div><b>Close your ring</b><span>Every glass fills it. Hit 100% to finish the day.</span></div></div>
+  <div class="feat"><div class="fi" style="color:var(--orange)"><svg width="28" height="28"><use href="#flame"/></svg></div><div><b>Build a streak</b><span>Each day you hit your goal adds to your streak.</span></div></div>
+  <div class="feat"><div class="fi" style="color:#5856D6"><svg width="26" height="26"><use href="#bell"/></svg></div><div><b>Gentle reminders</b><span>Only while you're awake. Skipped if you just had a drink.</span></div></div>
+  <div style="position:absolute;left:26px;right:26px;bottom:42px"><div class="btn">Continue</div></div>
+  <div class="homebar"></div>
+</div></div>
+<figcaption><b>Onboarding</b> · goal calculator</figcaption>
+</figure>
+
+<!-- 2. TODAY -->
+<figure>
+<div class="phone"><div class="screen">
+  <div class="island"></div>
+  <div class="status"><span>9:41</span><span class="r"><svg width="18" height="12"><use href="#signal"/></svg><svg width="27" height="13"><use href="#batt"/></svg></span></div>
+  <div class="content">
+    <div class="navrow" style="margin-top:6px">
+      <div class="subtitle" style="margin-bottom:0">Sunday, Nov 8</div>
+      <div class="streakchip"><svg width="15" height="15" style="color:var(--orange)"><use href="#flame"/></svg>12</div>
+    </div>
+    <div class="largetitle">Today</div>
+    <div class="ringwrap">
+      <svg width="236" height="236" viewBox="0 0 236 236">
+        <circle cx="118" cy="118" r="98" fill="none" stroke="rgba(255,94,77,.14)" stroke-width="24"/>
+        <circle cx="118" cy="118" r="98" fill="none" stroke="var(--blue)" stroke-width="24" stroke-linecap="round"
+                stroke-dasharray="418.7 615.8" transform="rotate(-90 118 118)"/>
+      </svg>
+      <div class="ringcenter">
+        <div class="big">1,700<small>ml</small></div>
+        <div class="of">of 2,500 ml · 68%</div>
+      </div>
+    </div>
+    <div class="quick">
+      <div class="qa"><svg width="24" height="24" style="color:var(--blue)"><use href="#cup"/></svg>150<span>Cup</span></div>
+      <div class="qa"><svg width="24" height="24" style="color:var(--blue)"><use href="#glass"/></svg>250<span>Glass</span></div>
+      <div class="qa"><svg width="24" height="24" style="color:var(--blue)"><use href="#bottle"/></svg>500<span>Bottle</span></div>
+      <div class="qa"><svg width="24" height="24" style="color:var(--blue)"><use href="#plus"/></svg>Custom<span>&nbsp;</span></div>
+    </div>
+    <div class="section-h">Today's log</div>
+    <div class="list">
+      <div class="row"><div class="ic" style="background:#0A84FF;color:#fff"><svg width="17" height="17"><use href="#glass"/></svg></div><div class="grow">Water</div><div class="val"><span class="meta">1:12 PM</span>&nbsp;250 ml</div></div>
+      <div class="row"><div class="ic" style="background:#A2845E;color:#fff"><svg width="17" height="17"><use href="#mug"/></svg></div><div class="grow">Coffee</div><div class="val"><span class="meta">10:40 AM</span>&nbsp;200 ml</div></div>
+    </div>
+  </div>
+  <div class="tabbar">
+    <div class="tab on"><svg width="26" height="26"><use href="#ringtab"/></svg>Today</div>
+    <div class="tab"><svg width="24" height="24"><use href="#flame"/></svg>Streak</div>
+    <div class="tab"><svg width="24" height="24"><use href="#gear"/></svg>Settings</div>
+  </div>
+  <div class="homebar"></div>
+</div></div>
+<figcaption><b>Today</b> · ring, quick add, log</figcaption>
+</figure>
+
+<!-- 3. LOG SHEET -->
+<figure>
+<div class="phone"><div class="screen">
+  <div class="island"></div>
+  <div class="status"><span>9:41</span><span class="r"><svg width="18" height="12"><use href="#signal"/></svg><svg width="27" height="13"><use href="#batt"/></svg></span></div>
+  <div class="content" style="opacity:.9">
+    <div class="largetitle" style="margin-top:34px">Today</div>
+  </div>
+  <div class="dim"></div>
+  <div class="sheet">
+    <div class="grabber"></div>
+    <div class="sheethd"><span style="color:var(--blue)">Cancel</span><b>Add Drink</b><span style="color:var(--blue);font-weight:600">Add</span></div>
+    <div class="seg"><div class="on">Water</div><div>Tea</div><div>Coffee</div><div>Other</div></div>
+    <div class="wheel">
+      <div class="sel"></div>
+      <div class="v" style="opacity:.2">300</div>
+      <div class="v" style="opacity:.45">325</div>
+      <div class="v" style="font-weight:600;font-size:23px">350 ml</div>
+      <div class="v" style="opacity:.45">375</div>
+      <div class="v" style="opacity:.2">400</div>
+    </div>
+    <div class="list">
+      <div class="row noicon"><div class="grow">Time</div><div class="val"><span style="background:var(--fill);color:var(--label);padding:5px 10px;border-radius:7px">3:24 PM</span></div></div>
+      <div class="row noicon"><div class="grow">Save as quick-add</div><div class="toggle off"></div></div>
+    </div>
+    <div style="text-align:center;font-size:13px;color:var(--label2)">2,050 of 2,500 ml after this · 82%</div>
+  </div>
+  <div class="homebar" style="z-index:30"></div>
+</div></div>
+<figcaption><b>Add Drink</b> · native form sheet</figcaption>
+</figure>
+
+<!-- 4. STREAK -->
+<figure>
+<div class="phone"><div class="screen">
+  <div class="island"></div>
+  <div class="status"><span>9:41</span><span class="r"><svg width="18" height="12"><use href="#signal"/></svg><svg width="27" height="13"><use href="#batt"/></svg></span></div>
+  <div class="content">
+    <div class="largetitle" style="margin:6px 4px 12px">Streak</div>
+    <div class="hero">
+      <div style="display:flex;align-items:center;gap:8px"><svg width="40" height="40" style="color:var(--orange)"><use href="#flame"/></svg><div class="n">12</div></div>
+      <div class="l" style="margin-top:4px">day streak · 800 ml to go today</div>
+      <div class="stats">
+        <div><span>31</span>Best</div>
+        <div><span style="display:flex;align-items:center;gap:4px"><svg width="16" height="16" style="color:#32ADE6"><use href="#snow"/></svg>1</span>Freeze</div>
+        <div><span>86%</span>This month</div>
+      </div>
+    </div>
+    <div class="cal">
+      <div class="hd"><span>November 2026</span><span style="color:var(--orange);display:flex;gap:14px"><svg width="14" height="14" style="transform:rotate(180deg)"><use href="#chev"/></svg><svg width="14" height="14" style="opacity:.3"><use href="#chev"/></svg></span></div>
+      <div class="dow"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+      <div class="days">
+        <div class="d met">1</div><div class="d met">2</div><div class="d met">3</div><div class="d frz">4</div><div class="d met">5</div><div class="d met">6</div><div class="d met">7</div>
+        <div class="d today">8</div><div class="d fut">9</div><div class="d fut">10</div><div class="d fut">11</div><div class="d fut">12</div><div class="d fut">13</div><div class="d fut">14</div>
+        <div class="d fut">15</div><div class="d fut">16</div><div class="d fut">17</div><div class="d fut">18</div><div class="d fut">19</div><div class="d fut">20</div><div class="d fut">21</div>
+        <div class="d fut">22</div><div class="d fut">23</div><div class="d fut">24</div><div class="d fut">25</div><div class="d fut">26</div><div class="d fut">27</div><div class="d fut">28</div>
+        <div class="d fut">29</div><div class="d fut">30</div>
+      </div>
+      <div class="legend"><span><i style="background:var(--orange)"></i>Goal met</span><span><i style="border:2px solid #5AC8FA;width:9px;height:9px"></i>Frozen</span><span><i style="background:var(--fill)"></i>Missed</span></div>
+    </div>
+    <div class="section-h">Milestones</div>
+    <div class="badges">
+      <div class="badge"><div class="b" style="background:#FF5E4D">3</div>3 days</div>
+      <div class="badge"><div class="b" style="background:#FF2D55">7</div>1 week</div>
+      <div class="badge lock"><div class="b">14</div>2 weeks</div>
+      <div class="badge lock"><div class="b">30</div>1 month</div>
+    </div>
+  </div>
+  <div class="tabbar">
+    <div class="tab"><svg width="26" height="26"><use href="#ringtab"/></svg>Today</div>
+    <div class="tab on" style="color:var(--orange)"><svg width="24" height="24"><use href="#flame"/></svg>Streak</div>
+    <div class="tab"><svg width="24" height="24"><use href="#gear"/></svg>Settings</div>
+  </div>
+  <div class="homebar"></div>
+</div></div>
+<figcaption><b>Streak</b> · calendar, freezes, milestones</figcaption>
+</figure>
+
+<!-- 5. SETTINGS -->
+<figure>
+<div class="phone"><div class="screen">
+  <div class="island"></div>
+  <div class="status"><span>9:41</span><span class="r"><svg width="18" height="12"><use href="#signal"/></svg><svg width="27" height="13"><use href="#batt"/></svg></span></div>
+  <div class="content">
+    <div class="largetitle" style="margin:6px 4px 14px">Settings</div>
+    <div class="list">
+      <div class="row"><div class="ic" style="background:#0A84FF;color:#fff"><svg width="17" height="17"><use href="#target"/></svg></div><div class="grow">Daily Goal</div><div class="val">2,500 ml<svg width="12" height="12" style="color:var(--label3)"><use href="#chev"/></svg></div></div>
+      <div class="row"><div class="ic" style="background:#8E8E93;color:#fff"><svg width="17" height="17"><use href="#ruler"/></svg></div><div class="grow">Units</div><div class="val">ml<svg width="12" height="12" style="color:var(--label3)"><use href="#chev"/></svg></div></div>
+      <div class="row"><div class="ic" style="background:#5AC8FA;color:#fff"><svg width="17" height="17"><use href="#glass"/></svg></div><div class="grow">Quick-Add Sizes</div><div class="val"><svg width="12" height="12" style="color:var(--label3)"><use href="#chev"/></svg></div></div>
+    </div>
+    <div class="section-h">Reminders</div>
+    <div class="list" style="margin-bottom:7px">
+      <div class="row"><div class="ic" style="background:#FF5E4D;color:#fff"><svg width="17" height="17"><use href="#bell"/></svg></div><div class="grow">Reminders</div><div class="toggle"></div></div>
+      <div class="row"><div class="ic" style="background:#FF9500;color:#fff"><svg width="17" height="17"><use href="#clock"/></svg></div><div class="grow">Every</div><div class="val">90 min<svg width="12" height="12" style="color:var(--label3)"><use href="#chev"/></svg></div></div>
+      <div class="row"><div class="ic" style="background:#FFCC00;color:#fff"><svg width="17" height="17"><use href="#bolt"/></svg></div><div class="grow">Active Hours</div><div class="val">8 AM – 10 PM</div></div>
+      <div class="row"><div class="ic" style="background:#5856D6;color:#fff"><svg width="17" height="17"><use href="#moon"/></svg></div><div class="grow">Smart Skip</div><div class="toggle"></div></div>
+      <div class="row"><div class="ic" style="background:#FF9500;color:#fff"><svg width="16" height="16"><use href="#flame"/></svg></div><div class="grow">Streak at Risk Alert</div><div class="toggle"></div></div>
+    </div>
+    <div style="font-size:12px;color:var(--label2);margin:0 16px 20px;line-height:1.35">Smart Skip holds the next reminder back if you logged a drink in the last 45 minutes.</div>
+    <div class="list">
+      <div class="row"><div class="ic" style="background:#FF2D55;color:#fff"><svg width="17" height="17"><use href="#heart"/></svg></div><div class="grow">Apple Health</div><div class="val">On<svg width="12" height="12" style="color:var(--label3)"><use href="#chev"/></svg></div></div>
+    </div>
+  </div>
+  <div class="tabbar">
+    <div class="tab"><svg width="26" height="26"><use href="#ringtab"/></svg>Today</div>
+    <div class="tab"><svg width="24" height="24"><use href="#flame"/></svg>Streak</div>
+    <div class="tab on"><svg width="24" height="24"><use href="#gear"/></svg>Settings</div>
+  </div>
+  <div class="homebar"></div>
+</div></div>
+<figcaption><b>Settings</b> · grouped inset list</figcaption>
+</figure>
+
+<!-- 6. NOTIFICATION -->
+<figure>
+<div class="phone"><div class="screen lock">
+  <div class="island"></div>
+  <div class="status" style="color:#fff"><span></span><span class="r"><svg width="18" height="12"><use href="#signal"/></svg><svg width="27" height="13"><use href="#batt"/></svg></span></div>
+  <div class="date">Sunday, November 8</div>
+  <div class="time">3:30</div>
+  <div style="flex:1"></div>
+  <div class="notif">
+    <div class="top"><div class="mini"><svg width="17" height="17" style="color:#fff"><use href="#sea"/></svg></div>CORAL<span style="margin-left:auto">now</span></div>
+    <div class="t">Time for a glass</div>
+    <div class="m">You're at 68%. 800 ml more keeps your 12-day streak going.</div>
+  </div>
+  <div class="actions">
+    <div>+ 250 ml</div>
+    <div>+ 500 ml</div>
+    <div style="color:#8E8E93">Remind me in 30 min</div>
+  </div>
+  <div style="height:60px"></div>
+  <div class="homebar" style="background:#fff"></div>
+</div></div>
+<figcaption><b>Reminder</b> · log right from the notification</figcaption>
+</figure>
+
+<!-- 7. DARK – GOAL MET -->
+<figure>
+<div class="phone"><div class="screen dark">
+  <div class="island"></div>
+  <div class="status"><span>9:41</span><span class="r"><svg width="18" height="12"><use href="#signal"/></svg><svg width="27" height="13"><use href="#batt"/></svg></span></div>
+  <div class="content">
+    <div class="navrow" style="margin-top:6px">
+      <div class="subtitle" style="margin-bottom:0">Sunday, Nov 8</div>
+      <div class="streakchip"><svg width="15" height="15" style="color:var(--orange)"><use href="#flame"/></svg>13</div>
+    </div>
+    <div class="largetitle">Today</div>
+    <div class="ringwrap">
+      <svg width="236" height="236" viewBox="0 0 236 236">
+        <circle cx="118" cy="118" r="98" fill="none" stroke="rgba(255,111,97,.24)" stroke-width="24"/>
+        <circle cx="118" cy="118" r="98" fill="none" stroke="var(--blue)" stroke-width="24" stroke-linecap="round"
+                stroke-dasharray="615.8 615.8" transform="rotate(-90 118 118)"/>
+      </svg>
+      <div class="ringcenter">
+        <div class="big">2,550<small>ml</small></div>
+        <div class="of" style="color:#34C759;font-weight:600">Goal complete</div>
+      </div>
+    </div>
+    <div class="card" style="padding:16px;display:flex;gap:14px;align-items:center;margin-bottom:16px;background:var(--card)">
+      <svg width="40" height="40" style="color:#FF9500;flex-shrink:0"><use href="#flame"/></svg>
+      <div><div style="font-weight:700;font-size:17px">13-day streak</div><div style="font-size:14px;color:var(--label2)">Next milestone at 14 days, one more to go.</div></div>
+    </div>
+    <div class="quick">
+      <div class="qa"><svg width="24" height="24" style="color:var(--blue)"><use href="#cup"/></svg>150<span>Cup</span></div>
+      <div class="qa"><svg width="24" height="24" style="color:var(--blue)"><use href="#glass"/></svg>250<span>Glass</span></div>
+      <div class="qa"><svg width="24" height="24" style="color:var(--blue)"><use href="#bottle"/></svg>500<span>Bottle</span></div>
+      <div class="qa"><svg width="24" height="24" style="color:var(--blue)"><use href="#plus"/></svg>Custom<span>&nbsp;</span></div>
+    </div>
+  </div>
+  <div class="tabbar">
+    <div class="tab on"><svg width="26" height="26"><use href="#ringtab"/></svg>Today</div>
+    <div class="tab"><svg width="24" height="24"><use href="#flame"/></svg>Streak</div>
+    <div class="tab"><svg width="24" height="24"><use href="#gear"/></svg>Settings</div>
+  </div>
+  <div class="homebar"></div>
+</div></div>
+<figcaption><b>Dark mode</b> · ring closed, streak +1</figcaption>
+</figure>
+
+</div>
+
+<div class="notes">
+  <div class="note"><h3>One accent: coral</h3>Coral is the only brand color, as Fitness uses pink and Notes uses yellow. Everything else uses iOS system colors, so light and dark mode adapt automatically.</div>
+  <div class="note"><h3>A seahorse as a symbol, not a character</h3>A single-color seahorse in the style of an SF Symbol. It appears only on the app icon and the welcome screen. No cartoon and no water drops.</div>
+  <div class="note"><h3>Streak first</h3>A streak chip on Today, a Streak tab with a calendar, freezes that protect a missed day, milestone badges and an evening "streak at risk" reminder.</div>
+</div>
+
+</body>
+</html>
