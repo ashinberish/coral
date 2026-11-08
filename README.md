@@ -41,6 +41,7 @@ Run every check: `make check`. The API deploys to Vercel on merge to `main`
 - **M0 Foundation** — monorepo, tooling, CI, backend foundation, local infra ✅
 - **M1 Design system** — tokens, Nunito, chunky components, 3D icon, Today screen (demo data) ✅
 - **Auth**: required sign-in with Apple / Google; API-issued JWT + rotating refresh tokens ✅ ([docs/auth.md](docs/auth.md))
-- M2 Logging & Today (data) · M3 Streaks · M4 Quests/pearls/badges · M5 Reminders · M6 Onboarding & settings · M7 Polish
+- **M2 Logging**: offline-first drink logs (on-device, synced with idempotent IDs), Today on real data, custom amount sheet ✅
+- M3 Streaks · M4 Quests/pearls/badges · M5 Reminders · M6 Onboarding & settings · M7 Polish
 
 Details in [docs/PLAN.md](docs/PLAN.md).

@@ -1,18 +1,41 @@
+import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
 import { FlameIcon, FreezeIcon, PearlIcon } from '@/components/icons';
 import { AppText, Bubble, Ring, Screen, StatPill } from '@/components/ui';
-import { demoToday } from '@/features/today/demo';
+import { useSession } from '@/features/auth';
+import { selectDay, totalMl, useDrinks } from '@/features/drinks';
 import { encouragement } from '@/features/today/encouragement';
 import { QuestList } from '@/features/today/QuestList';
+import { dailyQuests } from '@/features/today/quests';
+import { QUICK_ADDS } from '@/features/today/quickAdds';
 import { QuickAddGrid } from '@/features/today/QuickAddGrid';
-import { haptics } from '@/lib/haptics';
+import { TodayLog } from '@/features/today/TodayLog';
 import { formatNumber, percentOf } from '@/lib/format';
+import { haptics } from '@/lib/haptics';
+import { useToday } from '@/lib/useToday';
 import { colors, palette, spacing } from '@/theme';
 
+// Streak, freezes and pearls are wired in M3/M4.
+const PLACEHOLDER_STATS = { streak: 0, freezes: 0, pearls: 0 };
+
 export default function TodayScreen() {
-  const { streak, freezes, pearls, totalMl, goalMl, quickAdds, quests } = demoToday;
-  const percent = percentOf(totalMl, goalMl);
+  const today = useToday();
+  const goalMl = useSession((s) => s.user?.daily_goal_ml ?? 2500);
+  const allLogs = useDrinks((s) => s.logs);
+  const addDrink = useDrinks((s) => s.addDrink);
+  const removeDrink = useDrinks((s) => s.removeDrink);
+
+  const logs = selectDay(allLogs, today);
+  const total = totalMl(logs);
+  const percent = percentOf(total, goalMl);
+  const { streak, freezes, pearls } = PLACEHOLDER_STATS;
+
+  const add = (ml: number) => {
+    const closesRing = total < goalMl && total + ml >= goalMl;
+    void addDrink(ml);
+    if (closesRing) haptics.success();
+  };
 
   return (
     <Screen>
@@ -27,7 +50,7 @@ export default function TodayScreen() {
           tone="blue"
           icon={<FreezeIcon size={22} />}
           value={freezes}
-          accessibilityLabel={`${freezes} streak freeze`}
+          accessibilityLabel={`${freezes} streak freezes`}
         />
         <StatPill
           tone="purple"
@@ -39,25 +62,26 @@ export default function TodayScreen() {
 
       <View style={styles.ringWrap}>
         <Ring
-          progress={totalMl / goalMl}
-          accessibilityLabel={`${formatNumber(totalMl)} of ${formatNumber(goalMl)} millilitres`}
+          progress={total / goalMl}
+          accessibilityLabel={`${formatNumber(total)} of ${formatNumber(goalMl)} millilitres`}
         >
           <AppText variant="caption" color={palette.coral.base}>
             {`${percent}%`}
           </AppText>
-          <AppText variant="display">{formatNumber(totalMl)}</AppText>
+          <AppText variant="display">{formatNumber(total)}</AppText>
           <AppText variant="label" color={colors.inkMuted}>
             {`of ${formatNumber(goalMl)} ml`}
           </AppText>
         </Ring>
       </View>
 
-      <Bubble style={styles.bubble}>{encouragement(totalMl, goalMl)}</Bubble>
+      <Bubble style={styles.bubble}>{encouragement(total, goalMl)}</Bubble>
 
-      {/* Logging is wired to storage in M2; for now buttons give press + haptic feedback. */}
-      <QuickAddGrid sizes={quickAdds} onAdd={() => haptics.success()} onCustom={() => {}} />
+      <QuickAddGrid sizes={QUICK_ADDS} onAdd={add} onCustom={() => router.push('/log')} />
 
-      <QuestList quests={quests} />
+      <QuestList quests={dailyQuests(logs)} />
+
+      <TodayLog logs={logs} onDelete={(id) => void removeDrink(id)} />
     </Screen>
   );
 }

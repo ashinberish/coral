@@ -50,7 +50,7 @@ Badge     { id, unlocked_at?, level? }
 | **M0** ✅ | Monorepo, tooling, CI, backend foundation (settings, DB, migrations, telemetry, errors, health), local infra, docs | All checks green in CI |
 | **M1** ✅ | Design tokens, Nunito, ChunkyButton/Tile/Bubble/ProgressBar/Ring/StatPill/Medal/TabBar, icon set, 3D icon + splash, Today screen on demo data, `/design` style guide | Today matches the mockup |
 | Auth ✅ | Sign in with Apple / Google, JWT + rotating refresh tokens, `/v1/me` (incl. account deletion), typed API client, protected routes | Signed-out users only see sign-in |
-| M2 | Local DB + store; Today wired to real logs; custom amount sheet; API: users + drink-log endpoints, generated TS client | Logs persist across restarts |
+| M2 ✅ | Local DB + store; Today wired to real logs; custom amount sheet; API: users + drink-log endpoints, generated TS client | Logs persist across restarts |
 | M3 | Streak engine (unit-tested incl. DST/timezones), Streak screen, "Ring closed" celebration | Streak maths tested |
 | M4 | Pearls, quests, badges, freeze shop, Badges screen | Rewards correct |
 | M5 | Reminders: permission flow, scheduling in waking hours, Smart Skip, streak-at-risk, log from notification | Works on a dev build |
@@ -58,3 +58,12 @@ Badge     { id, unlocked_at?, level? }
 | M7 | Polish: animations, sounds, reduced motion, VoiceOver, Dynamic Type, dark mode | Ready for TestFlight |
 
 Later: widgets, Apple Health sync, Live Activity.
+
+## Sync model (M2)
+
+Drinks are written to the device first (zustand persisted to SQLite key-value storage) and
+pushed to `POST /v1/drinks` in the background. Every log carries a **client-generated UUID**;
+the API inserts with `ON CONFLICT DO NOTHING`, so retrying after a lost response never creates
+a duplicate. Deletes are idempotent too. Sync runs after each change, on launch, and on every
+return to the foreground; `pullDay` then reconciles today's logs with the server (unsynced
+local changes always win). Signing out clears local drink data.

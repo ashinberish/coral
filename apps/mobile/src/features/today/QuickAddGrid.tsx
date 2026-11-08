@@ -4,7 +4,7 @@ import { BottleIcon, CupIcon, GlassIcon, PlusIcon } from '@/components/icons';
 import { AppText, ChunkyButton } from '@/components/ui';
 import { colors, spacing } from '@/theme';
 
-import type { QuickAddSize } from './demo';
+import type { QuickAddSize } from './quickAdds';
 
 const ICONS = { cup: CupIcon, glass: GlassIcon, bottle: BottleIcon } as const;
 
